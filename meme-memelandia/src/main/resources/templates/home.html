@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Memelandia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .main-title {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .form-section {
+            width: 30%;
+            text-align: center;
+        }
+        .form-wrapper {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+        .item-list {
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        .item-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .item-list li {
+            background: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .list-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f4f4f4;
+        }
+        .list-item h3 {
+            margin: 0;
+        }
+        .list-item p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="main-title">
+    <h1>MEMELANDIA</h1>
+    <button type="button" id="reload" onclick="reload()">Reload</button>
+</div>
+
+<div class="container">
+    <!-- USER -->
+    <div class="form-section">
+        <h2>User</h2>
+        <div class="form-wrapper">
+            <form>
+                <label for="name">Name:</label><br>
+                <input type="text" id="name" name="name"><br>
+
+                <label for="email">Email:</label><br>
+                <input type="email" id="email" name="email"><br>
+
+                <button type="button" id="userMeme" onclick="createUser()">Create</button>
+                <button type="button" id="loadUsers" onclick="loadUsers()">load Categories</button>
+            </form>
+            <div class="item-list">
+                <ul id="usersList">
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- CATEGORY -->
+    <div class="form-section">
+        <h2>Category</h2>
+        <div class="form-wrapper">
+            <form>
+                <label for="categoryName">Name:</label><br>
+                <input type="text" id="categoryName" name="categoryName"><br>
+
+                <label for="description">Description:</label><br>
+                <input type="text" id="description" name="description"><br>
+
+                <button type="button" id="createCategory" onclick="createCategory()">Create</button>
+                <button type="button" id="loadAllCategories" onclick="loadCategories()">load Categories</button>
+            </form>
+            <div class="item-list">
+                <ul id="categoryList">
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATE CATEGORY -->
+    <div class="form-section">
+        <h2>UPDATE CATEGORY</h2>
+        <div class="form-wrapper">
+            <form>
+                <label for="id">ID:</label><br>
+                <input type="text" id="id" name="id"><br>
+
+                <label for="newName">Name:</label><br>
+                <input type="text" id="newName" name="newName"><br>
+
+                <label for="newDescription">Description:</label><br>
+                <input type="text" id="newDescription" name="newDescription"><br>
+
+                <button type="button" id="update" onclick="update()">update</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MEME -->
+    <div class="form-section">
+        <h2>Meme</h2>
+        <div class="form-wrapper">
+            <form>
+                <label for="memeName">Name:</label><br>
+                <input type="text" id="memeName" name="memeName"><br>
+
+                <label for="url">Url:</label><br>
+                <input type="text" id="url" name="url"><br>
+
+                <label for="userId">User ID:</label><br>
+                <input type="text" id="userId" name="userId"><br><br>
+
+                <label for="categoryId">Category ID:</label><br>
+                <input type="text" id="categoryId" name="categoryId"><br><br>
+
+                <button type="button" id="createMeme" onclick="createMeme()">Create</button>
+                <button type="button" id="loadAllMemes" onclick="loadMemes()">load Memes</button>
+            </form>
+            <div class="item-list">
+                <ul id="memeList">
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    <!--    User    /-->
+        document.getElementById("userMeme").addEventListener("click", function () {
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+
+        const userData = {
+            name: name,
+            email: email,
+        };
+
+        createUserMeme(userData);
+    });
+
+    let userUrl = "http://localhost:8081/api/user";
+    function createUser(userData) {
+        fetch(userUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(userData)
+        })
+        loadUsers();
+    }
+
+    function loadUsers() {
+        fetch(userUrl)
+            .then(response => response.json())
+            .then(data => {
+                const usersList = document.getElementById("usersList");
+                usersList.innerHTML = "";
+                data.forEach(user => {
+                    const item = document.createElement("li");
+                    item.className = "list-item";
+                    item.innerHTML = `
+                            <h3>ID: ${user.id}</h3>
+                            <p><strong>Name:</strong> ${user.name}</p>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                            <p><strong>Created At:</strong> ${user.created_at}</p>
+                            <p><strong>Updated At:</strong> ${user.updated_at}</p>
+                            <button type="button" id="${user.id}" onclick="deleteUser(${user.id})">delete</button>
+                        `;
+                    usersList.appendChild(item);
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
+    function deleteUser(id) {
+            fetch(userUrl + "/" + id, {
+            method: "DELETE",
+        })
+        loadUsers();
+    }
+
+    <!--    Category    /-->
+        document.getElementById("createCategory").addEventListener("click", function () {
+        const name = document.getElementById("categoryName").value;
+        const description = document.getElementById("description").value;
+
+        const categoryData = {
+            name: name,
+            description: description,
+        };
+
+        createCategory(categoryData);
+    });
+
+    let categoryUrl = "http://localhost:8082/api/category";
+    function createCategory(categoryData) {
+        fetch(categoryUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(categoryData)
+        })
+    }
+
+<!--    UPDATE     -->
+    document.getElementById("update").addEventListener("click", function () {
+        const id = document.getElementById("id").value;
+        const name = document.getElementById("newName").value;
+        const description = document.getElementById("newDescription").value;
+
+        const categoryData = {
+            name: name,
+            description: description,
+        };
+
+        updateCategory(categoryData, id);
+    });
+
+    function updateCategory(categoryData, id) {
+    const urlUpdate = categoryUrl+"/"+id
+    fetch(urlUpdate, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(categoryData)
+        })
+    }
+
+    function loadCategories() {
+        fetch(categoryUrl)
+            .then(response => response.json())
+            .then(data => {
+                const categoryList = document.getElementById("categoryList");
+                categoryList.innerHTML = "";
+                data.forEach(category => {
+                    const item = document.createElement("li");
+                    item.className = "list-item";
+                    item.innerHTML = `
+                            <h3>ID: ${category.id}</h3>
+                            <p><strong>Name:</strong> ${category.name}</p>
+                            <p><strong>Description:</strong> ${category.description}</p>
+                            <p><strong>Created At:</strong> ${category.created_at}</p>
+                            <p><strong>Updated At:</strong> ${category.updated_at}</p>
+                        `;
+                    categoryList.appendChild(item);
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
+    <!--    Meme    /-->
+    document.getElementById("createMeme").addEventListener("click", function () {
+        const name = document.getElementById("memeName").value;
+        const url = document.getElementById("url").value;
+        const userId = document.getElementById("userId").value;
+        const categoryId = document.getElementById("categoryId").value;
+
+        const memeData = {
+            name: name,
+            memeUrl: url
+        };
+
+        createMeme(memeData, userId, categoryId);
+    });
+
+    let memeUrl = "http://localhost:8083/api/meme";
+
+    function createMeme(memeData, userId, categoryId) {
+    const memeUrlPost = memeUrl + "/" + userId + "/" + categoryId;
+        fetch(memeUrlPost, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(memeData)
+        })
+    }
+
+    function loadMemes() {
+        fetch(memeUrl)
+            .then(response => response.json())
+            .then(data => {
+                const memeList = document.getElementById("memeList");
+                memeList.innerHTML = "";
+                data.forEach(meme => {
+                    const item = document.createElement("li");
+                    item.className = "list-item";
+                    item.innerHTML = `
+                            <h3>ID: ${meme.id}</h3>
+                            <p><strong>Meme:</strong> ${meme.name}</p>
+                            <p><strong>URL:</strong> <a href="${meme.memeUrl}" target="_blank">${meme.memeUrl}</a></p>
+                            <p><strong>Category:</strong> ${meme.category}</p>
+                            <p><strong>Created By:</strong> ${meme.createdBy}</p>
+                            <p><strong>Created At:</strong> ${meme.created_at}</p>
+                            <p><strong>Updated At:</strong> ${meme.updated_at}</p>
+                        `;
+                    memeList.appendChild(item);
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
+    function reload() {
+        loadUsers();
+        loadCategories();
+        loadMemes();
+    }
+
+</script>
+</html>

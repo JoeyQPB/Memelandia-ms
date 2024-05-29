@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  cassandra:
+    image: cassandra:4.0.7
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+    volumes:
+      - C:\Users\joey_\IdeaProjects\Memelandia\cassandra-docker-volume:/var/lib/cassandra
+    restart: unless-stopped
