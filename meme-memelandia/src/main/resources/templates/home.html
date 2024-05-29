@@ -166,7 +166,7 @@
             email: email,
         };
 
-        createUserMeme(userData);
+        createUser(userData);
     });
 
     let userUrl = "http://localhost:8081/api/user";
@@ -196,7 +196,7 @@
                             <p><strong>Email:</strong> ${user.email}</p>
                             <p><strong>Created At:</strong> ${user.created_at}</p>
                             <p><strong>Updated At:</strong> ${user.updated_at}</p>
-                            <button type="button" id="${user.id}" onclick="deleteUser(${user.id})">delete</button>
+                            <button type="button" id="${user.id}" onclick="deleteUser('${user.id}')">delete</button>
                         `;
                     usersList.appendChild(item);
                 });
@@ -235,6 +235,7 @@
             },
             body: JSON.stringify(categoryData)
         })
+        loadCategories();
     }
 
 <!--    UPDATE     -->
@@ -260,6 +261,7 @@
             },
             body: JSON.stringify(categoryData)
         })
+        loadCategories();
     }
 
     function loadCategories() {
@@ -277,6 +279,7 @@
                             <p><strong>Description:</strong> ${category.description}</p>
                             <p><strong>Created At:</strong> ${category.created_at}</p>
                             <p><strong>Updated At:</strong> ${category.updated_at}</p>
+                            <button type="button" id="${category.id}" onclick="deleteCategory('${category.id}')">delete</button>
                         `;
                     categoryList.appendChild(item);
                 });
@@ -284,6 +287,13 @@
             .catch(error => {
                 console.error(error);
             });
+    }
+
+    function deleteCategory(id) {
+        fetch(categoryUrl + "/" + id, {
+        method: "DELETE",
+        })
+        loadCategories();
     }
 
     <!--    Meme    /-->
@@ -312,6 +322,7 @@
             },
             body: JSON.stringify(memeData)
         })
+        loadMemes();
     }
 
     function loadMemes() {
@@ -331,6 +342,7 @@
                             <p><strong>Created By:</strong> ${meme.createdBy}</p>
                             <p><strong>Created At:</strong> ${meme.created_at}</p>
                             <p><strong>Updated At:</strong> ${meme.updated_at}</p>
+                            <button type="button" id="${meme.id}" onclick="deleteMeme('${meme.id}')">delete</button>
                         `;
                     memeList.appendChild(item);
                 });
@@ -338,6 +350,13 @@
             .catch(error => {
                 console.error(error);
             });
+    }
+
+    function deleteMeme(id) {
+        fetch(memeUrl + "/" + id, {
+        method: "DELETE",
+        })
+        loadMemes();
     }
 
     function reload() {
